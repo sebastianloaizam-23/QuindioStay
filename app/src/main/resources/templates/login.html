@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Iniciar sesión')}"></head>
+<body class="qs">
+<!-- Prototipo "Login" de la Entrega 2: foto a la izquierda, formulario a la derecha -->
+<div class="qs-login-fondo">
+    <div class="qs-login">
+        <div class="qs-login-foto">
+            <h1>Fidelización<br>de millas</h1>
+            <div class="circulo-1"></div>
+            <div class="circulo-2"></div>
+            <div class="flecha"><i class="bi bi-arrow-right"></i></div>
+        </div>
+
+        <div class="qs-login-form">
+            <h2>Bienvenido de nuevo</h2>
+
+            <div th:if="${param.error}" class="alert alert-danger py-2 small">Correo/usuario o contraseña incorrectos.</div>
+            <div th:if="${param.bloqueado}" class="alert alert-warning py-2 small">Este usuario está bloqueado. Comuníquese con el administrador.</div>
+            <div th:if="${param.salir}" class="alert alert-success py-2 small">Sesión cerrada.</div>
+
+            <form th:action="@{/login}" method="post">
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold" for="usuario">Correo electrónico</label>
+                    <input class="form-control" id="usuario" name="usuario" required autofocus
+                           placeholder="Ingresa tu correo (o tu usuario interno)">
+                </div>
+                <div class="mb-2">
+                    <label class="form-label small fw-semibold" for="clave">Contraseña</label>
+                    <input class="form-control" id="clave" name="clave" type="password" required
+                           placeholder="Ingresa tu contraseña">
+                </div>
+                <div class="form-check mb-3 small">
+                    <input class="form-check-input" type="checkbox" id="recordarme" name="recordarme">
+                    <label class="form-check-label text-muted" for="recordarme">Recordarme</label>
+                </div>
+                <button class="btn btn-qs w-100 py-2">Entrar</button>
+            </form>
+            <hr class="mt-4">
+            <p class="small text-muted mb-0">Clientes: entran con su correo. Personal interno: con su nombre de usuario.</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

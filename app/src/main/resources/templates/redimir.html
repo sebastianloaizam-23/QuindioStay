@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Redimir beneficio')}"></head>
+<body class="qs">
+<div class="qs-shell">
+    <div class="qs-foto"></div>
+    <aside class="qs-lado">
+        <h2>Redimir beneficio</h2>
+        <p class="small text-muted">Se ejecuta <code>CALL sp_redimir(membresía, beneficio)</code>. La base valida
+            el saldo, el costo vigente y el nivel del cliente; si algo falla no queda nada a medias.</p>
+        <form th:action="@{/redimir}" method="post">
+            <div class="mb-2">
+                <label class="form-label" for="m">Membresía (cliente · saldo · nivel)</label>
+                <select class="form-select" id="m" name="idMembresia" required>
+                    <option value="">— Seleccione —</option>
+                    <option th:each="m : ${membresias}" th:value="${m.get('id')}" th:text="${m.get('id') + ' · ' + m.get('etiqueta')}">membresía</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="b">Beneficio (costo · nivel mínimo · aliado)</label>
+                <select class="form-select" id="b" name="idBeneficio" required>
+                    <option value="">— Seleccione —</option>
+                    <option th:each="b : ${beneficios}" th:value="${b.get('id')}" th:text="${b.get('id') + ' · ' + b.get('etiqueta')}">beneficio</option>
+                </select>
+            </div>
+            <button class="btn btn-qs w-100">Redimir</button>
+        </form>
+    </aside>
+    <main class="qs-main">
+        <header th:replace="~{fragments :: menu('redimir')}"></header>
+        <h1 class="qs-titulo">Redenciones</h1>
+        <p class="qs-pregunta">Últimos canjes registrados</p>
+        <div th:replace="~{fragments :: mensajes}"></div>
+        <div th:replace="~{fragments :: tabla(${ultimas})}"></div>
+    </main>
+</div>
+<th:block th:replace="~{fragments :: scripts}"></th:block>
+</body>
+</html>

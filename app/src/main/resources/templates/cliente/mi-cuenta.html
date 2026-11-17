@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Mi cuenta')}"></head>
+<body class="qs">
+<div class="qs-shell">
+    <aside class="qs-panel">
+        <h1>Fidelización<br>de millas</h1>
+        <h2 th:text="${cliente.get('nombres') + ' ' + cliente.get('apellidos')}">Cliente</h2>
+        <p class="small mb-1" th:text="${cliente.get('correo')}">correo</p>
+        <p class="small text-muted" th:text="${cliente.get('ciudad_origen')}">ciudad</p>
+
+        <th:block th:if="${membresia != null}">
+            <p class="mb-1">Nivel actual</p>
+            <span class="qs-nivel fs-5" th:classappend="${membresia.get('nivel')}" th:text="${#strings.capitalize(membresia.get('nivel'))}">Oro</span>
+            <p class="mt-3 mb-0 small">Saldo disponible</p>
+            <div class="fs-2 fw-bold text-success" th:text="${@fmt.numero(membresia.get('saldo')) + ' pts'}">0 pts</div>
+            <p class="small text-muted">Acumulado últimos 12 meses:
+                <span th:text="${@fmt.numero(membresia.get('acumulado_12m'))}">0</span> pts</p>
+            <a class="btn btn-qs w-100" th:href="@{/mi-cuenta/certificado}" target="_blank">
+                <i class="bi bi-award"></i> Descargar certificado</a>
+        </th:block>
+        <div th:if="${membresia == null}" class="alert alert-light small">
+            Aún no estás inscrito(a) en el programa de puntos.
+        </div>
+    </aside>
+
+    <main class="qs-main">
+        <header th:replace="~{fragments :: menu('cuenta')}"></header>
+        <h1 class="qs-titulo">Mi cuenta</h1>
+        <p class="qs-pregunta">Tus puntos, beneficios y reservas en QuindioStay.</p>
+        <div th:replace="~{fragments :: mensajes}"></div>
+
+        <th:block th:if="${membresia != null}">
+            <h5 class="fw-semibold mt-3">Beneficios para canjear</h5>
+            <div class="table-responsive">
+                <table class="table table-sm table-hover qs-tabla">
+                    <thead><tr><th>Beneficio</th><th>Aliado</th><th>Nivel mínimo</th><th>Costo</th><th class="text-end">Canjear</th></tr></thead>
+                    <tbody>
+                    <tr th:each="b : ${beneficios}">
+                        <td th:text="${b.get('nombre')}">beneficio</td>
+                        <td th:text="${b.get('aliado')}">aliado</td>
+                        <td><span class="qs-nivel small" th:classappend="${b.get('nivel_minimo')}" th:text="${b.get('nivel_minimo')}">bronce</span></td>
+                        <td th:text="${@fmt.numero(b.get('costo_puntos')) + ' pts'}">0</td>
+                        <td class="text-end">
+                            <form th:action="@{/mi-cuenta/canjear}" method="post" class="d-inline"
+                                  onsubmit="return confirm('¿Canjear este beneficio con tus puntos?');">
+                                <input type="hidden" name="idBeneficio" th:value="${b.get('id_beneficio')}">
+                                <button class="btn btn-sm btn-qs px-3">Canjear</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h5 class="fw-semibold mt-4">Movimientos de puntos</h5>
+            <div th:replace="~{fragments :: tabla(${movimientos})}"></div>
+        </th:block>
+
+        <h5 class="fw-semibold mt-4">Mis reservas</h5>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover qs-tabla">
+                <thead><tr><th>N.º</th><th>Fecha servicio</th><th>Plan</th><th>Prestador</th><th>Estado</th><th>Valor</th><th class="text-end">Comprobante</th></tr></thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(reservas)}"><td colspan="7" class="text-muted fst-italic">No tienes reservas.</td></tr>
+                <tr th:each="r : ${reservas}">
+                    <td th:text="${r.get('id_reserva')}">1</td>
+                    <td th:text="${@fmt.v(r.get('fecha_servicio'))}">fecha</td>
+                    <td th:text="${r.get('plan')}">plan</td>
+                    <td th:text="${r.get('prestador')}">prestador</td>
+                    <td th:text="${r.get('estado')}">estado</td>
+                    <td th:text="${@fmt.dinero(r.get('valor_total'))}">valor</td>
+                    <td class="text-end"><a class="btn btn-outline-success btn-doc" target="_blank"
+                                            th:href="@{/mi-cuenta/comprobante(id=${r.get('id_reserva')})}">PDF</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+<th:block th:replace="~{fragments :: scripts}"></th:block>
+</body>
+</html>

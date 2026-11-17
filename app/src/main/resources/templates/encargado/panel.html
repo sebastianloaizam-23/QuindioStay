@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Mi prestador')}"></head>
+<body class="qs">
+<div class="qs-shell">
+    <aside class="qs-panel">
+        <h1>Fidelización<br>de Clientes</h1>
+        <h2 th:text="${prestador.get('nombre_comercial')}">Prestador</h2>
+        <p class="small mb-1" th:text="${prestador.get('tipo') + ' · ' + prestador.get('municipio')}">tipo</p>
+        <p class="small mb-1" th:text="${'NIT ' + prestador.get('nit_documento')}">nit</p>
+        <p class="small mb-1" th:text="${prestador.get('direccion')}">dirección</p>
+        <p class="small" th:text="${'Estado: ' + prestador.get('estado')}">estado</p>
+        <div th:if="${puntosPor1000 != null}" class="alert alert-success small">
+            Prestador <strong>aliado</strong>: da <strong th:text="${puntosPor1000}">5</strong> puntos por cada $1.000.
+        </div>
+        <div th:if="${puntosPor1000 == null}" class="alert alert-light small">
+            Este prestador no es aliado del programa de puntos.
+        </div>
+    </aside>
+
+    <main class="qs-main">
+        <header th:replace="~{fragments :: menu('encargado')}"></header>
+        <h1 class="qs-titulo">Mi prestador</h1>
+        <p class="qs-pregunta">Solo ves la información de tu prestador.</p>
+
+        <h5 class="fw-semibold mt-3">Beneficios que entrega</h5>
+        <div th:replace="~{fragments :: tabla(${beneficios})}"></div>
+
+        <h5 class="fw-semibold mt-4">Movimientos de puntos (acumulaciones y canjes)</h5>
+        <div th:replace="~{fragments :: tabla(${movimientos})}"></div>
+
+        <h5 class="fw-semibold mt-4">Planes</h5>
+        <div th:replace="~{fragments :: tabla(${planes})}"></div>
+
+        <h5 class="fw-semibold mt-4">Reservas recientes</h5>
+        <div th:replace="~{fragments :: tabla(${reservas})}"></div>
+    </main>
+</div>
+<th:block th:replace="~{fragments :: scripts}"></th:block>
+</body>
+</html>

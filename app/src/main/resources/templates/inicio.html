@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments :: head('Inicio')}"></head>
+<body class="qs">
+<div class="qs-shell">
+    <aside class="qs-panel">
+        <h1>Fidelización<br>de Clientes</h1>
+        <h2>Bienvenido(a)</h2>
+        <p class="small" th:text="${#authentication.principal.nombreMostrar}">usuario</p>
+        <p class="small text-muted">Desde aquí puedes administrar los registros de las 17 tablas,
+            canjear beneficios, ver los 10 reportes y generar los documentos en PDF.</p>
+        <div class="d-grid gap-2 mt-3">
+            <a class="btn btn-qs" th:href="@{/reportes}"><i class="bi bi-bar-chart"></i> Ver reportes</a>
+            <a class="btn btn-qs-borde" th:href="@{/redimir}"><i class="bi bi-gift"></i> Redimir beneficio</a>
+            <a class="btn btn-qs-borde" th:href="@{/documentos}"><i class="bi bi-file-earmark-pdf"></i> Documentos</a>
+        </div>
+    </aside>
+
+    <main class="qs-main">
+        <header th:replace="~{fragments :: menu('inicio')}"></header>
+
+        <h1 class="qs-titulo">Panel principal</h1>
+        <p class="qs-pregunta">
+            <i class="bi bi-database-check text-success"></i>
+            Conexión con MySQL correcta: hay <strong th:text="${conteos.get('cliente')}">150</strong> clientes en la base <code>quindiostay</code>.
+        </p>
+
+        <h6 class="text-uppercase text-muted small fw-bold mt-4">Núcleo común</h6>
+        <div class="row g-3">
+            <div class="col-6 col-md-4 col-xl-3" th:each="e : ${conteos}" th:unless="${fidelizacion.contains(e.key)}">
+                <a class="qs-tarjeta" th:href="@{/crud/{t}(t=${e.key})}">
+                    <div class="numero" th:text="${@fmt.numero(e.value)}">0</div>
+                    <div th:text="${titulos.get(e.key)}">Tabla</div>
+                    <code class="small" th:text="${e.key}">tabla</code>
+                </a>
+            </div>
+        </div>
+
+        <h6 class="text-uppercase text-muted small fw-bold mt-4">Módulo de fidelización</h6>
+        <div class="row g-3">
+            <div class="col-6 col-md-4 col-xl-3" th:each="e : ${conteos}" th:if="${fidelizacion.contains(e.key)}">
+                <a class="qs-tarjeta" th:href="@{/crud/{t}(t=${e.key})}">
+                    <div class="numero" th:text="${@fmt.numero(e.value)}">0</div>
+                    <div th:text="${titulos.get(e.key)}">Tabla</div>
+                    <code class="small" th:text="${e.key}">tabla</code>
+                </a>
+            </div>
+        </div>
+    </main>
+</div>
+<th:block th:replace="~{fragments :: scripts}"></th:block>
+</body>
+</html>

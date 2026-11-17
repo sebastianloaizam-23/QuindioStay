@@ -1,0 +1,153 @@
+/* Estilo de QuindioStay: sigue los prototipos de la Entrega 2
+   (verde, franja con foto de palmas, formulario al lado de la tabla). */
+:root {
+    --qs-verde: #1d8342;
+    --qs-verde-oscuro: #12542a;
+    --qs-verde-tabla: #136b4a;
+    --qs-verde-claro: #e9f5ee;
+    --qs-amarillo: #f2be50;
+    --qs-rojo: #e73439;
+}
+
+body.qs {
+    font-family: 'Poppins', system-ui, sans-serif;
+    background: #eef1ef;
+    font-size: .9rem;
+    color: #1f2a24;
+}
+
+/* ---------- Estructura general ---------- */
+.qs-shell { display: flex; min-height: 100vh; background: #fff; }
+
+/* Franja vertical con la foto (si existe img/cocora.jpg) o el dibujo de palmas */
+.qs-foto {
+    width: 150px; flex-shrink: 0; position: relative; overflow: hidden;
+    background: url('/img/cocora.jpg') center / cover no-repeat,
+                url('/img/palmas.svg') center bottom / cover no-repeat,
+                linear-gradient(#f3a46b, #1d8342);
+}
+.qs-foto::after {           /* puntitos decorativos */
+    content: ""; position: absolute; left: 18px; bottom: 30px; width: 40px; height: 30px;
+    background-image: radial-gradient(#fff 1.5px, transparent 1.5px);
+    background-size: 10px 10px; opacity: .8;
+}
+
+/* Columna lateral blanca (formularios) */
+.qs-lado {
+    width: 300px; flex-shrink: 0; padding: 1.5rem 1.2rem;
+    border-right: 1px solid #e3e8e5; max-height: 100vh; overflow-y: auto; position: sticky; top: 0;
+}
+/* Panel lateral verde (reportes, inicio) */
+.qs-panel {
+    width: 290px; flex-shrink: 0; padding: 1.8rem 1.3rem; position: relative; overflow: hidden;
+    background: var(--qs-verde-claro); border-right: 1px solid #d5e8dc;
+}
+.qs-panel::before {
+    content: ""; position: absolute; left: -60px; bottom: -60px; width: 200px; height: 200px;
+    border-radius: 50%; background: var(--qs-verde); opacity: .9;
+}
+.qs-panel::after {
+    content: ""; position: absolute; left: 15px; bottom: 140px; width: 40px; height: 30px;
+    background-image: radial-gradient(var(--qs-verde) 1.5px, transparent 1.5px);
+    background-size: 10px 10px;
+}
+.qs-panel > * { position: relative; z-index: 1; }
+.qs-panel h1 { color: var(--qs-verde-oscuro); font-weight: 700; font-size: 1.8rem; line-height: 1.1; }
+.qs-panel h2 { font-size: 1.15rem; font-weight: 600; margin-top: 1.2rem; }
+
+.qs-main { flex: 1; min-width: 0; padding: 1.2rem 1.8rem 2rem; position: relative; }
+.qs-main::before {          /* círculo verde arriba a la derecha */
+    content: ""; position: absolute; right: 40px; top: 52px; width: 26px; height: 26px;
+    border-radius: 50%; background: var(--qs-verde);
+}
+.qs-main::after {
+    content: ""; position: absolute; right: 8px; top: 40px; width: 50px; height: 50px;
+    border-radius: 50%; border: 1.5px solid var(--qs-verde); border-left-color: transparent;
+}
+
+/* ---------- Barra superior ---------- */
+.qs-top { border-bottom: 1px solid #e3e8e5; padding-bottom: .7rem; margin-bottom: 1.4rem; }
+.qs-marca { font-weight: 700; color: var(--qs-verde-oscuro); text-decoration: none; font-size: 1.1rem; }
+.qs-top nav a {
+    color: #2b3a31; text-decoration: none; padding: .25rem .6rem; border-radius: 20px; font-size: .85rem;
+}
+.qs-top nav a:hover, .qs-top nav a.activo { background: var(--qs-verde); color: #fff; }
+
+/* ---------- Títulos ---------- */
+.qs-titulo { color: var(--qs-verde-oscuro); font-weight: 700; font-size: 1.5rem; margin-bottom: .2rem; }
+.qs-pregunta { color: #333; margin-bottom: 1rem; }
+.qs-lado h2 { color: var(--qs-verde-oscuro); font-weight: 700; font-size: 1.35rem; }
+
+/* ---------- Formularios ---------- */
+.qs-lado label, .qs-panel label { font-size: .78rem; font-weight: 600; margin-bottom: .15rem; }
+.qs .form-control, .qs .form-select { border-radius: 8px; font-size: .82rem; }
+.qs .form-control:focus, .qs .form-select:focus { border-color: var(--qs-verde); box-shadow: 0 0 0 .15rem rgba(29,131,66,.2); }
+.btn-qs {
+    background: var(--qs-verde); color: #fff; border-radius: 20px; font-weight: 500; border: none;
+}
+.btn-qs:hover { background: var(--qs-verde-oscuro); color: #fff; }
+.btn-qs-borde { border: 1px solid var(--qs-verde); color: var(--qs-verde); border-radius: 20px; background: #fff; }
+.btn-qs-borde:hover { background: var(--qs-verde); color: #fff; }
+
+/* ---------- Tablas ---------- */
+.qs-tabla { font-size: .8rem; }
+.qs-tabla thead th {
+    background: var(--qs-verde-tabla); color: #fff; font-weight: 500; vertical-align: middle;
+    border: none; white-space: nowrap;
+}
+.qs-tabla td { vertical-align: middle; }
+.qs-tabla tr.grupo td { font-weight: 700; background: #f4f7f5; text-transform: uppercase; font-size: .75rem; }
+.btn-editar, .btn-borrar {
+    width: 26px; height: 26px; padding: 0; border-radius: 5px; border: none; color: #fff;
+    display: inline-flex; align-items: center; justify-content: center; font-size: .75rem;
+}
+.btn-editar { background: var(--qs-amarillo); color: #3a2a00; }
+.btn-borrar { background: var(--qs-rojo); }
+.btn-doc { font-size: .7rem; padding: .1rem .4rem; border-radius: 5px; }
+
+.qs .pagination .page-link { color: var(--qs-verde); border-radius: 5px; margin: 0 2px; font-size: .78rem; }
+.qs .pagination .active .page-link { background: var(--qs-verde); border-color: var(--qs-verde); color: #fff; }
+
+/* Tarjetas del inicio */
+.qs-tarjeta {
+    border: 1px solid #dfe9e3; border-radius: 12px; padding: 1rem; text-decoration: none; color: inherit;
+    display: block; transition: .15s;
+}
+.qs-tarjeta:hover { border-color: var(--qs-verde); box-shadow: 0 4px 14px rgba(0,0,0,.06); }
+.qs-tarjeta .numero { font-size: 1.6rem; font-weight: 700; color: var(--qs-verde); }
+.qs-nivel { display: inline-block; padding: .1rem .7rem; border-radius: 20px; color: #fff; font-weight: 600; }
+.qs-nivel.bronce { background: #b0703c; } .qs-nivel.plata { background: #8d99a3; }
+.qs-nivel.oro { background: #d4a017; } .qs-nivel.platino { background: #4c6b7d; }
+
+/* ---------- Login ---------- */
+.qs-login-fondo { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #eef1ef; padding: 2rem; }
+.qs-login {
+    display: flex; width: 100%; max-width: 980px; min-height: 560px; background: #fff;
+    border-radius: 16px; overflow: hidden; box-shadow: 0 18px 50px rgba(0,0,0,.12);
+}
+.qs-login-foto {
+    flex: 1; position: relative; padding: 2rem;
+    background: url('/img/cocora.jpg') center / cover no-repeat,
+                url('/img/palmas.svg') center bottom / cover no-repeat,
+                linear-gradient(#f3a46b, #1d8342);
+}
+.qs-login-foto h1 { color: #fff; font-weight: 700; font-size: 2.3rem; line-height: 1.1; text-shadow: 0 2px 8px rgba(0,0,0,.3); }
+.qs-login-foto .flecha {
+    position: absolute; right: -32px; top: 50%; width: 64px; height: 64px; border-radius: 50%;
+    background: var(--qs-verde); border: 5px solid #fff; color: #fff; font-size: 1.6rem;
+    display: flex; align-items: center; justify-content: center; z-index: 2;
+}
+.qs-login-foto .circulo-1 { position: absolute; left: 30px; bottom: 80px; width: 34px; height: 34px; border-radius: 50%; background: var(--qs-verde); }
+.qs-login-foto .circulo-2 { position: absolute; left: 40%; bottom: -60px; width: 140px; height: 140px; border-radius: 50%; background: var(--qs-verde); }
+.qs-login-form { flex: 1; padding: 3.5rem 3.5rem; display: flex; flex-direction: column; justify-content: center; }
+.qs-login-form h2 { color: var(--qs-verde); font-weight: 700; font-size: 2rem; margin-bottom: 1.5rem; }
+.qs-login-form .form-control { border-radius: 20px; padding: .55rem 1rem; }
+
+@media (max-width: 900px) {
+    .qs-shell { flex-direction: column; }
+    .qs-foto { width: 100%; height: 90px; }
+    .qs-lado, .qs-panel { width: 100%; max-height: none; position: static; }
+    .qs-login { flex-direction: column; }
+    .qs-login-foto { min-height: 220px; }
+    .qs-login-foto .flecha { display: none; }
+}

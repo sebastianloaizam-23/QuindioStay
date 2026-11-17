@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(${tabla.titulo})}"></head>
+<body class="qs">
+<!-- Prototipo "CRUD - Registro de clientes": foto, formulario y tabla con editar/borrar -->
+<div class="qs-shell">
+    <div class="qs-foto"></div>
+
+    <!-- ===================== FORMULARIO (Create / Update) ===================== -->
+    <aside class="qs-lado">
+        <h2 th:text="${(nuevo ? 'Registro de ' : 'Editar ') + #strings.toLowerCase(tabla.titulo)}">Registro de clientes</h2>
+        <p class="small text-muted" th:unless="${nuevo}">Registro N.º <strong th:text="${idEditar}">1</strong></p>
+
+        <div th:if="${tabla.soloLectura}" class="alert alert-info small">
+            Las redenciones no se escriben a mano: se crean con el procedimiento
+            <code>sp_redimir</code>, que descuenta los puntos y registra el canje en una sola transacción.
+            <a th:href="@{/redimir}" class="btn btn-qs w-100 mt-2">Ir a Redimir</a>
+        </div>
+        <div th:if="${!nuevo and tabla.sinEditar}" class="alert alert-info small">
+            Los movimientos de puntos son historial y no se modifican (lo impide un trigger).
+            Para corregir, registre un <strong>ajuste manual</strong>.
+            <a th:href="@{/crud/{t}(t=${tabla.nombre})}" class="btn btn-qs w-100 mt-2">Nuevo movimiento</a>
+        </div>
+
+        <form th:unless="${tabla.soloLectura or (!nuevo and tabla.sinEditar)}"
+              th:action="@{/crud/{t}/guardar(t=${tabla.nombre})}" method="post">
+            <input type="hidden" name="_id" th:value="${nuevo ? '' : idEditar}">
+
+            <th:block th:each="c : ${tabla.columnas}">
+                <div class="mb-2" th:unless="${c.autoIncremental and nuevo}">
+                    <label class="form-label" th:for="${'f_' + c.nombre}">
+                        <span th:text="${c.etiqueta}">Campo</span><span th:if="${c.obligatorio}" class="text-danger"> *</span>
+                    </label>
+
+                    <!-- La llave primaria no se cambia al editar -->
+                    <input th:if="${!nuevo and c.pk}" class="form-control" th:value="${valores.get(c.nombre)}" disabled>
+
+                    <th:block th:unless="${!nuevo and c.pk}">
+                        <!-- Llave foránea: menú con los registros de la otra tabla -->
+                        <select th:if="${c.fk}" class="form-select" th:id="${'f_' + c.nombre}" th:name="${c.nombre}"
+                                th:required="${!c.nula}">
+                            <option value="" th:text="${c.nula ? '— Ninguno —' : '— Seleccione —'}">— Seleccione —</option>
+                            <option th:each="e : ${etiquetas.get(c.nombre)}" th:value="${e.key}"
+                                    th:text="${e.key + ' · ' + e.value}"
+                                    th:selected="${e.key == valores.get(c.nombre)}">opción</option>
+                        </select>
+
+                        <!-- Valores permitidos por un CHECK: menú desplegable -->
+                        <select th:if="${!c.fk and c.opciones != null}" class="form-select"
+                                th:id="${'f_' + c.nombre}" th:name="${c.nombre}" th:required="${!c.nula}">
+                            <option th:if="${c.nula}" value="">— Ninguno —</option>
+                            <option th:each="o : ${c.opciones}" th:value="${o}" th:text="${o}"
+                                    th:selected="${o == valores.get(c.nombre)}">opción</option>
+                        </select>
+
+                        <textarea th:if="${!c.fk and c.opciones == null and c.tipoInput == 'textarea'}"
+                                  class="form-control" rows="2" th:id="${'f_' + c.nombre}" th:name="${c.nombre}"
+                                  th:text="${valores.get(c.nombre)}" th:required="${c.obligatorio}"></textarea>
+
+                        <input th:if="${!c.fk and c.opciones == null and c.tipoInput != 'textarea'}"
+                               class="form-control" th:id="${'f_' + c.nombre}" th:name="${c.nombre}"
+                               th:type="${c.clave ? 'password' : c.tipoInput}"
+                               th:value="${valores.get(c.nombre)}"
+                               th:step="${c.tipoInput == 'number' ? c.paso : (c.tipoInput == 'datetime-local' ? '1' : null)}"
+                               th:required="${c.obligatorio and !(c.clave and !nuevo)}"
+                               th:placeholder="${c.clave ? (nuevo ? (c.nula ? 'Vacía = cliente sin cuenta' : 'Ingrese la contraseña') : 'Vacía = no cambiarla') : (c.defectoExpresion ? 'Vacío = automático' : 'Ingrese ' + #strings.toLowerCase(c.etiqueta))}">
+                    </th:block>
+                    <div class="form-text small" th:if="${c.comentario}" th:text="${c.comentario}">ayuda</div>
+                </div>
+            </th:block>
+
+            <button class="btn btn-qs w-100 mt-2" th:text="${nuevo ? 'Registrar' : 'Guardar cambios'}">Registrar</button>
+            <a th:unless="${nuevo}" th:href="@{/crud/{t}(t=${tabla.nombre})}" class="btn btn-link btn-sm w-100 text-success">Cancelar edición</a>
+        </form>
+    </aside>
+
+    <!-- ===================== TABLA (Read / Delete) ===================== -->
+    <main class="qs-main">
+        <header th:replace="~{fragments :: menu('crud')}"></header>
+
+        <div class="d-flex flex-wrap align-items-end gap-3 mb-2 me-5">
+            <div>
+                <h1 class="qs-titulo" th:text="${tabla.titulo}">Clientes</h1>
+                <div class="small text-muted" th:text="${tabla.descripcion}">descripción</div>
+            </div>
+            <div class="ms-auto">
+                <label class="small fw-semibold">Tabla</label>
+                <select class="form-select form-select-sm" onchange="location.href = this.value">
+                    <option th:each="m : ${menu}" th:value="@{/crud/{t}(t=${m.key})}" th:text="${m.value}"
+                            th:selected="${m.key == tabla.nombre}">tabla</option>
+                </select>
+            </div>
+        </div>
+
+        <div th:replace="~{fragments :: mensajes}"></div>
+
+        <form class="d-flex gap-2 mb-2" method="get" th:action="@{/crud/{t}(t=${tabla.nombre})}">
+            <input class="form-control form-control-sm" name="q" th:value="${q}" placeholder="Buscar en todas las columnas..." style="max-width: 320px">
+            <button class="btn btn-sm btn-qs px-3"><i class="bi bi-search"></i> Buscar</button>
+            <a th:if="${q != ''}" class="btn btn-sm btn-link text-success" th:href="@{/crud/{t}(t=${tabla.nombre})}">Quitar filtro</a>
+            <span class="ms-auto small text-muted align-self-center"><strong th:text="${total}">0</strong> registros</span>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-sm table-hover qs-tabla">
+                <thead>
+                <tr>
+                    <th th:each="c : ${tabla.columnas}" th:text="${c.etiqueta}">Columna</th>
+                    <th class="text-end">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(filas)}"><td th:colspan="${#lists.size(tabla.columnas) + 1}" class="text-muted fst-italic">Sin registros.</td></tr>
+                <tr th:each="f : ${filas}">
+                    <td th:each="celda : ${f.celdas}" th:text="${celda}">valor</td>
+                    <td class="text-end text-nowrap">
+                        <!-- Documentos en PDF según la tabla -->
+                        <th:block th:if="${tabla.nombre == 'reserva'}">
+                            <a class="btn btn-outline-success btn-doc" th:href="@{/documentos/reserva(id=${f.id})}" target="_blank" title="Comprobante de reserva">Comprobante</a>
+                            <a class="btn btn-outline-success btn-doc" th:href="@{/documentos/factura(id=${f.id})}" target="_blank" title="Factura">Factura</a>
+                            <a class="btn btn-outline-secondary btn-doc" th:href="@{/crud/pago(id_reserva=${f.id})}" title="Registrar un pago de esta reserva">+ Pago</a>
+                        </th:block>
+                        <a th:if="${tabla.nombre == 'pago'}" class="btn btn-outline-success btn-doc" th:href="@{/documentos/pago(id=${f.id})}" target="_blank">Comprobante</a>
+                        <th:block th:if="${tabla.nombre == 'cliente'}">
+                            <a class="btn btn-outline-success btn-doc" th:href="@{/documentos/autorizacion(id=${f.id})}" target="_blank">Autorización</a>
+                            <a class="btn btn-outline-success btn-doc" th:href="@{/documentos/certificado(id=${f.id})}" target="_blank">Certificado</a>
+                        </th:block>
+
+                        <a th:unless="${tabla.sinEditar or tabla.soloLectura}" class="btn-editar" title="Editar"
+                           th:href="@{/crud/{t}(t=${tabla.nombre}, editar=${f.id}, q=${q}, p=${pagina})}"><i class="bi bi-pencil-fill"></i></a>
+                        <form th:unless="${tabla.soloLectura}" class="d-inline" method="post"
+                              th:action="@{/crud/{t}/{id}/eliminar(t=${tabla.nombre}, id=${f.id})}"
+                              onsubmit="return confirm('¿Seguro que desea eliminar este registro?');">
+                            <button class="btn-borrar" title="Eliminar"><i class="bi bi-trash-fill"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <nav th:if="${totalPaginas > 1}">
+            <ul class="pagination pagination-sm justify-content-end">
+                <li class="page-item" th:classappend="${pagina == 1} ? 'disabled'">
+                    <a class="page-link" th:href="@{/crud/{t}(t=${tabla.nombre}, q=${q}, p=${pagina - 1})}">&lsaquo;</a>
+                </li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(desde, hasta)}" th:classappend="${i == pagina} ? 'active'">
+                    <a class="page-link" th:href="@{/crud/{t}(t=${tabla.nombre}, q=${q}, p=${i})}" th:text="${i}">1</a>
+                </li>
+                <li class="page-item" th:classappend="${pagina == totalPaginas} ? 'disabled'">
+                    <a class="page-link" th:href="@{/crud/{t}(t=${tabla.nombre}, q=${q}, p=${pagina + 1})}">&rsaquo;</a>
+                </li>
+            </ul>
+        </nav>
+    </main>
+</div>
+<th:block th:replace="~{fragments :: scripts}"></th:block>
+</body>
+</html>

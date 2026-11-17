@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(${reporte.codigo})}"></head>
+<body class="qs">
+<!-- Prototipo "Reporte de clientes por nivel": panel verde con filtros a la izquierda y tabla a la derecha -->
+<div class="qs-shell">
+    <aside class="qs-panel">
+        <h1>Fidelización<br>de Clientes</h1>
+
+        <!-- Filtros solo para el R7, como en el prototipo -->
+        <th:block th:if="${reporte.codigo == 'R7'}">
+            <h2>R7 Clientes por Nivel</h2>
+            <form method="get" th:action="@{/reportes/R7}">
+                <div class="mb-2">
+                    <label class="form-label" for="nivel">Nivel de cliente</label>
+                    <select class="form-select" id="nivel" name="nivel">
+                        <option value="">Todos</option>
+                        <option th:each="n : ${niveles}" th:value="${n}" th:text="${#strings.capitalize(n)}" th:selected="${n == fNivel}">nivel</option>
+                    </select>
+                </div>
+                <label class="form-label">Acumulaciones (últimos 12 m)</label>
+                <div class="d-flex gap-2 mb-3">
+                    <input class="form-control" type="number" name="min" placeholder="mín" th:value="${fMin}">
+                    <input class="form-control" type="number" name="max" placeholder="máx" th:value="${fMax}">
+                </div>
+                <button class="btn btn-qs w-100">Filtrar y generar</button>
+            </form>
+        </th:block>
+
+        <h2>Reportes</h2>
+        <div class="list-group list-group-flush small mb-5">
+            <a th:each="r : ${reportes}" th:href="@{/reportes/{c}(c=${r.codigo})}"
+               class="list-group-item list-group-item-action bg-transparent px-1 py-1"
+               th:classappend="${r.codigo == reporte.codigo} ? 'fw-bold text-success'">
+                <span th:text="${r.codigo + ' · ' + r.titulo}">R1</span>
+                <span class="badge rounded-pill text-bg-light border" th:text="${r.nivel}">Simple</span>
+            </a>
+        </div>
+    </aside>
+
+    <main class="qs-main">
+        <header th:replace="~{fragments :: menu('reportes')}"></header>
+
+        <div class="d-flex flex-wrap align-items-start gap-2 me-5">
+            <div>
+                <h1 class="qs-titulo" th:text="${reporte.codigo + ': Reporte de ' + reporte.titulo}">R7: Reporte de Clientes por Nivel</h1>
+                <p class="qs-pregunta" th:text="${reporte.pregunta}">pregunta</p>
+            </div>
+            <a class="btn btn-qs ms-auto" target="_blank"
+               th:href="@{/reportes/{c}/pdf(c=${reporte.codigo}, nivel=${fNivel}, min=${fMin}, max=${fMax})}">
+                <i class="bi bi-file-earmark-pdf"></i> Exportar a PDF</a>
+        </div>
+
+        <div class="row g-4">
+            <div th:class="${reporte.grafico != null ? 'col-xl-7' : 'col-12'}">
+                <div th:replace="~{fragments :: tabla(${filas})}"></div>
+            </div>
+            <div class="col-xl-5" th:if="${reporte.grafico != null}">
+                <div class="border rounded-3 p-3"><canvas id="grafico" height="260"></canvas></div>
+            </div>
+        </div>
+
+        <!-- Detalle del R7 agrupado por nivel (prototipo de la Entrega 2) -->
+        <th:block th:if="${reporte.codigo == 'R7'}">
+            <h5 class="mt-4 fw-semibold">Detalle de clientes por nivel</h5>
+            <div class="table-responsive">
+                <table class="table table-sm table-hover qs-tabla">
+                    <thead>
+                    <tr><th>Nivel</th><th>ID cliente</th><th>Nombres</th><th>Apellidos</th><th>Membresía</th>
+                        <th>Puntos (12 m)</th><th>Saldo</th><th>Ciudad</th><th class="text-end">Acciones</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#maps.isEmpty(grupos)}"><td colspan="9" class="text-muted fst-italic">No hay clientes con esos filtros.</td></tr>
+                    <th:block th:each="g : ${grupos}">
+                        <tr class="grupo"><td colspan="9" th:text="${g.key + ' (' + #lists.size(g.value) + ')'}">ORO</td></tr>
+                        <tr th:each="f : ${g.value}">
+                            <td><span class="qs-nivel small" th:classappend="${g.key}" th:text="${g.key}">oro</span></td>
+                            <td th:text="${f.get('id_cliente')}">1</td>
+                            <td th:text="${f.get('nombres')}">Ana</td>
+                            <td th:text="${f.get('apellidos')}">Gómez</td>
+                            <td th:text="${#strings.capitalize(g.key)}">Oro</td>
+                            <td th:text="${@fmt.numero(f.get('puntos_12m')) + ' pts'}">0</td>
+                            <td th:text="${@fmt.numero(f.get('saldo')) + ' pts'}">0</td>
+                            <td th:text="${f.get('ciudad')}">Armenia</td>
+                            <td class="text-end">
+                                <a class="btn-editar" title="Editar cliente" th:href="@{/crud/cliente(editar=${f.get('id_cliente')})}"><i class="bi bi-pencil-fill"></i></a>
+                                <a class="btn btn-outline-success btn-doc" title="Certificado de puntos" target="_blank"
+                                   th:href="@{/documentos/certificado(id=${f.get('id_cliente')})}"><i class="bi bi-award"></i></a>
+                            </td>
+                        </tr>
+                    </th:block>
+                    </tbody>
+                </table>
+            </div>
+        </th:block>
+    </main>
+</div>
+
+<th:block th:if="${reporte.grafico != null}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script th:inline="javascript">
+        const etiquetas = /*[[${etiquetas}]]*/ [];
+        const series = /*[[${series}]]*/ {};
+        const tipo = /*[[${reporte.grafico}]]*/ 'bar';
+        const verdes = ['#1d8342', '#f2be50', '#136b4a', '#e73439', '#7cc49a', '#4c6b7d', '#b0703c', '#8d99a3'];
+        const datasets = Object.keys(series).map((nombre, i) => ({
+            label: nombre,
+            data: series[nombre],
+            backgroundColor: tipo === 'pie' ? verdes : verdes[i % verdes.length],
+            borderColor: tipo === 'pie' ? '#fff' : verdes[i % verdes.length],
+            tension: 0.25
+        }));
+        new Chart(document.getElementById('grafico'), {
+            type: tipo,
+            data: { labels: etiquetas, datasets: datasets },
+            options: {
+                plugins: { legend: { position: 'bottom' } },
+                scales: tipo === 'pie' ? {} : { y: { beginAtZero: true } }
+            }
+        });
+    </script>
+</th:block>
+<th:block th:replace="~{fragments :: scripts}"></th:block>
+</body>
+</html>

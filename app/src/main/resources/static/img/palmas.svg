@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 800" preserveAspectRatio="xMidYMax slice">
+  <!-- Dibujo propio: atardecer con palmas de cera (Valle de Cocora). Se usa si no hay foto en img/cocora.jpg -->
+  <defs>
+    <linearGradient id="cielo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6d8fb5"/>
+      <stop offset=".35" stop-color="#e9a07a"/>
+      <stop offset=".55" stop-color="#f6c189"/>
+      <stop offset="1" stop-color="#f3b27d"/>
+    </linearGradient>
+    <linearGradient id="niebla" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity=".35"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="800" fill="url(#cielo)"/>
+  <circle cx="300" cy="380" r="40" fill="#fde3b0" opacity=".8"/>
+  <path d="M0 470 Q80 400 160 450 T320 420 T400 440 V800 H0Z" fill="#7d8f8a" opacity=".7"/>
+  <path d="M0 520 Q100 460 200 510 T400 490 V800 H0Z" fill="#4f6d5c"/>
+  <rect y="440" width="400" height="140" fill="url(#niebla)"/>
+  <path d="M0 610 Q120 560 240 600 T400 590 V800 H0Z" fill="#2f5a40"/>
+  <path d="M0 690 Q150 650 280 690 T400 680 V800 H0Z" fill="#1d4730"/>
+  <g stroke="#1b2d22" stroke-linecap="round" fill="none">
+    <!-- palma 1 -->
+    <path d="M90 800 C92 600 88 400 95 160" stroke-width="5"/>
+    <path d="M95 160 q-40 -10 -70 20 M95 160 q40 -12 70 15 M95 160 q-25 -30 -55 -30 M95 160 q30 -30 60 -25 M95 160 q-5 -35 5 -55 M95 160 q-45 15 -60 50 M95 160 q45 10 58 48" stroke-width="3"/>
+    <!-- palma 2 -->
+    <path d="M230 800 C228 640 236 470 232 300" stroke-width="4"/>
+    <path d="M232 300 q-35 -8 -60 16 M232 300 q35 -10 60 12 M232 300 q-20 -25 -45 -25 M232 300 q25 -25 50 -20 M232 300 q-38 12 -50 42 M232 300 q38 10 48 40" stroke-width="2.5"/>
+    <!-- palma 3 -->
+    <path d="M330 800 C332 680 326 560 330 450" stroke-width="3"/>
+    <path d="M330 450 q-25 -6 -42 12 M330 450 q25 -8 42 10 M330 450 q-14 -18 -32 -18 M330 450 q18 -18 35 -14 M330 450 q-26 9 -34 30 M330 450 q26 8 33 28" stroke-width="2"/>
+    <!-- palma lejana -->
+    <path d="M170 800 C171 700 168 620 170 540" stroke-width="2" opacity=".7"/>
+    <path d="M170 540 q-18 -4 -30 8 M170 540 q18 -5 30 7 M170 540 q-18 6 -24 20 M170 540 q18 6 23 19" stroke-width="1.5" opacity=".7"/>
+  </g>
+</svg>
